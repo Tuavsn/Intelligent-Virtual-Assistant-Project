@@ -19,3 +19,6 @@ while True:
         break
     engine.say(robot)
     engine.runAndWait()
+    '''
+    làm Game đi làm Game tốt cho sức khỏe đặc biệt là người già trẻ nhỏ
+    '''

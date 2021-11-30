@@ -19,10 +19,3 @@ while True:
         break
     engine.say(robot)
     engine.runAndWait()
-    
-    '''
-    công thức tính 1 giá trị ngẫu nhiên :
-    ngẫu_nhiên = 15
-    ngẫu_nhiên = (ngẫu_nhiên * 8 + 4) % 11
-  
-    '''

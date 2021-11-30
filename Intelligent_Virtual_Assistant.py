@@ -1,13 +1,21 @@
 import pyttsx3
 import speech_recognition
 ear=speech_recognition.Recognizer()
-with speech_recognition.Microphone() as mic:
-    print("say something :)")
-    audio = ear.listen(mic)
-try:
-    you = ear.recognize_google(audio)
-except:
-    you = "what"
 engine=pyttsx3.init()
-engine.say(you)
-engine.runAndWait()
+while True:
+    with speech_recognition.Microphone() as mic:
+        print("say something :)")
+        audio = ear.listen(mic)
+    try:
+        you = ear.recognize_google(audio)
+    except:
+        robot = "what"
+    if you=="hello":
+        robot="hello sir"
+    elif you=="goodbye":
+        robot="goodbye Tuan"
+        engine.say(robot)
+        engine.runAndWait()
+        break
+    engine.say(robot)
+    engine.runAndWait()

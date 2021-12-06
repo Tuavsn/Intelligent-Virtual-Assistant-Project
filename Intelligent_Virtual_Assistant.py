@@ -73,7 +73,7 @@ def youtube_search():
     speak_v('Bạn muốn xem gì?')
     while True:
         search_for = ai_listen()
-        if result:
+        if search_for:
             domain = search_for
             break
     url = 'https://www.youtube.com/results?search_query='+domain
@@ -82,7 +82,7 @@ def youtube_search():
 
 def open_website():
     speak_v('nhập website mà bạn muốn truy cập')
-    website = str(input('nhập website bạn muốn truy cập (phải thêm .com or ...): '))
+    website = str(input('nhập website bạn muốn truy cập: https://www.'))
     domain = website
     url = 'https://www.' + domain
     webbrowser.open(url)
@@ -115,37 +115,33 @@ def welcome():
         speak_v("Tôi có thể giúp gì được cho bạn") 
 
 #------------------MAIN()-----------------------------#
-if __name__ == '__main__':
-    start_button=str(input())
-    if start_button=="start":                                   
-            welcome()
-            while True:
-                query = ai_listen().lower()
-                if 'chào' in query:
-                    speak_v('Chào bạn')
-                elif 'hello' in query:
-                    speak('Hello sir')
-                elif 'hôm nay là ngày' in query:
-                    ngay()
-                elif 'bây giờ là mấy giờ' in query:
-                    gio()
-                elif 'what is today' in query:
-                    day()
-                elif 'time' in query:
-                    time()
-                elif 'youtube' in query:
-                    youtube_search()
-                elif 'website' in query:
-                    open_website()
-                elif 'google' in query:
-                    google_search()
-                elif 'à thế à' in query:
-                    speak_v('À thế làm sao mà à')
-                elif 'tạm biệt' in query:
-                    speak_v('Tạm biệt bạn')
-                    break
-                elif 'goodbye' in query:
-                    speak('Goodbye sir')
-                    break
-
-
+if __name__ == '__main__':                                 
+    welcome()
+    while True:
+        query = ai_listen().lower()
+        if 'chào' in query:
+            speak_v('Chào bạn')
+        elif 'hello' in query:
+            speak('Hello sir')
+        elif 'hôm nay là ngày' in query:
+            ngay()
+        elif 'bây giờ là mấy giờ' in query:
+            gio()
+        elif 'what is today' in query:
+            day()
+        elif 'time' in query:
+            time()
+        elif 'youtube' in query:
+            youtube_search()
+        elif 'website' in query:
+            open_website()
+        elif 'google' in query:
+            google_search()
+        elif 'à thế à' in query:
+            speak_v('À thế làm sao mà à')
+        elif 'tạm biệt' in query:
+            speak_v('Tạm biệt bạn')
+            break
+        elif 'goodbye' in query:
+            speak('Goodbye sir')
+            break

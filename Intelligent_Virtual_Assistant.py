@@ -4,14 +4,19 @@
 #                   pip install speechrecognition
 #                   pip install pipwin
 #                   pipwin install pyaudio
-
+#                   pip install gTTS
+#                   pip install playsound
 #---------------------------//------------------------------#
 #-----------------IMPORT THƯ VIỆN--------------------#
+from math import e
+import threading
+import pocketsphinx
+import runpy
 import pyttsx3                                  # THƯ VIỆN NÓI
 from gtts import gTTS
 from playsound import playsound                 # THƯ VIỆN CHẠY NHẠC
 import os                                       # THƯ VIỆN MỞ ĐÓNG FILE
-import time
+from time import sleep
 import speech_recognition                       # THƯ VIỆN NHẬN DIỆN GIỌNG NÓI
 from datetime import date, datetime             # THƯ VIỆN NGÀY THÁNG
 import webbrowser                               # THƯ VIỆN BROWSER
@@ -22,18 +27,40 @@ ai_ear = speech_recognition.Recognizer()
 ai_mouth = pyttsx3.init()              
 voice=ai_mouth.getProperty('voices')
 ai_mouth.setProperty('voice',voice[1].id)                             # Thiết lập giọng nữ cho AI ( voice[0]: giọng nam )
+keyword=[("help", 1)]
 #------------------ASSISTANT FUNCTION------------------#
+
 def ai_listen():
     with speech_recognition.Microphone() as mic:                                 
         print("AI: AI đang nghe")
-        audio = ai_ear.listen(mic)                                    # Ai lắng nghe giọng nói của bạn qua microphone rồi lưu vào biến audio
+        ai_ear.dynamic_energy_threshold = 3000
+        audio = ai_ear.record(mic,duration=3)                                    # Ai lắng nghe giọng nói của bạn qua microphone rồi lưu vào biến audio
         print("AI: .....")
     try:
-        your_query=ai_ear.recognize_google(audio,language='vi-VN')    #Ai nhận diện giọng nói của bạn thông qua biến audio
+        your_query=ai_ear.recognize_google(audio, language='vi-VN')    #Ai nhận diện giọng nói của bạn thông qua biến audio
     except:
-        speak_v('Oops!, bạn có thể nói lại được không?')
+        speak_v('xin lỗi tôi không nghe được bạn nói')
         your_query=''
-    return your_query
+    return your_query.lower()
+
+def start_recognizer():
+    while True:
+        with speech_recognition.Microphone() as mic:
+            ai_ear.dynamic_energy_threshold = 3000
+            audio = ai_ear.record(mic, duration=2)
+        try:
+            speech_as_text = ai_ear.recognize_sphinx(audio,keyword_entries=keyword)
+            if "help" in speech_as_text:
+                speak_v("tôi có thể giúp gì cho bạn")
+                break
+            else:
+                pass
+        except speech_recognition.WaitTimeoutError:
+            pass
+        except speech_recognition.UnknownValueError:
+            pass
+        except speech_recognition.RequestError:
+            print("Network error.")
 
 def speak_v(audio):
     tts = gTTS(text=audio, lang='vi',slow=False)
@@ -95,30 +122,39 @@ def google_search():
         if search_for:
             domain = search_for
             break
-    speak('Đang trả về kết quả tìm kiếm')
+    speak_v('Đang trả về kết quả tìm kiếm')
     url="https://www.google.com/search?q="+domain
-    webbrowser.open(url)
+    webbrowser.open(url) 
+
+def game_con_ran():
+    runpy.run_path(file_path='importturtle.py')
+
+def play_game():
+    import importturtle
+    importturtle.thread.stop()
 
 def welcome():
     hour=datetime.now().hour
     if hour >=1 and hour < 6:
         speak_v('Xin chào')
-        speak_v("Tôi có thể giúp gì được cho bạn") 
+        speak_v('bạn vẫn còn thức sao')
+        speak_v("Hãy gọi tôi khi bạn cần") 
     elif hour >= 6 and hour < 12:
         speak_v('Chào buổi sáng')
-        speak_v("Tôi có thể giúp gì được cho bạn") 
+        speak_v("Hãy gọi tôi khi bạn cần")
     elif hour >= 12 and hour < 18:
         speak_v('Chào bạn')
-        speak_v("Tôi có thể giúp gì được cho bạn") 
+        speak_v("Hãy gọi tôi khi bạn cần") 
     elif hour >= 18 and hour < 24:
         speak_v('Chào buổi tối')
-        speak_v("Tôi có thể giúp gì được cho bạn") 
+        speak_v("Hãy gọi tôi khi bạn cần")
 
 #------------------MAIN()-----------------------------#
 if __name__ == '__main__':                                 
     welcome()
     while True:
-        query = ai_listen().lower()
+        Ai_call = start_recognizer()
+        query = ai_listen()
         if 'chào' in query:
             speak_v('Chào bạn')
         elif 'hello' in query:
@@ -137,11 +173,13 @@ if __name__ == '__main__':
             open_website()
         elif 'google' in query:
             google_search()
+        elif 'trò chơi' in query:
+            play_game()
         elif 'à thế à' in query:
             speak_v('À thế làm sao mà à')
         elif 'tạm biệt' in query:
             speak_v('Tạm biệt bạn')
-            break
+            exit()
         elif 'goodbye' in query:
             speak('Goodbye sir')
-            break
+            exit()

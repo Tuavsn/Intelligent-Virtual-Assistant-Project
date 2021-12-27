@@ -9,8 +9,6 @@
 #---------------------------//------------------------------#
 #-----------------IMPORT THƯ VIỆN--------------------#
 from math import e
-import threading
-import pocketsphinx
 import runpy
 import pyttsx3                                  # THƯ VIỆN NÓI
 from gtts import gTTS
@@ -22,12 +20,10 @@ from datetime import date, datetime             # THƯ VIỆN NGÀY THÁNG
 import webbrowser                               # THƯ VIỆN BROWSER
 #----------------ASSISTANT MACHINE-------------------#
 # KHỞI TẠO
-ai_brain = ' '
 ai_ear = speech_recognition.Recognizer()        
 ai_mouth = pyttsx3.init()              
 voice=ai_mouth.getProperty('voices')
 ai_mouth.setProperty('voice',voice[1].id)                             # Thiết lập giọng nữ cho AI ( voice[0]: giọng nam )
-keyword=[("help", 1)]
 #------------------ASSISTANT FUNCTION------------------#
 
 def ai_listen():
@@ -43,14 +39,14 @@ def ai_listen():
         your_query=''
     return your_query.lower()
 
-def start_recognizer():
+def ai_wake():
     while True:
         with speech_recognition.Microphone() as mic:
-            ai_ear.dynamic_energy_threshold = 3000
-            audio = ai_ear.record(mic, duration=2)
+            ai_ear.dynamic_energy_threshold = 4000
+            audio = ai_ear.record(mic, duration=5)
         try:
-            speech_as_text = ai_ear.recognize_sphinx(audio,keyword_entries=keyword)
-            if "help" in speech_as_text:
+            speech_as_text = ai_ear.recognize_google(audio)
+            if "assistant" or "hey assistant" in speech_as_text:
                 speak_v("tôi có thể giúp gì cho bạn")
                 break
             else:
@@ -126,12 +122,9 @@ def google_search():
     url="https://www.google.com/search?q="+domain
     webbrowser.open(url) 
 
-def game_con_ran():
-    runpy.run_path(file_path='importturtle.py')
-
-def play_game():
-    import importturtle
-    importturtle.thread.stop()
+# def play_game():
+#     import importturtle
+#     importturtle.thread.stop()
 
 def welcome():
     hour=datetime.now().hour
@@ -148,12 +141,22 @@ def welcome():
     elif hour >= 18 and hour < 24:
         speak_v('Chào buổi tối')
         speak_v("Hãy gọi tôi khi bạn cần")
+    print('------------------------------------------------')
+    print("Gọi tôi bằng lệnh: Assistant hoặc Hey Assistant")
+    print('--------------//---------------')
+    print('''Một số chức năng cơ bản:
+        1. Thông báo ngày, giờ.
+        2. Tìm kiếm trên youtube, google.
+        3. Truy cập website.
+        4. Trò chơi rắn săn mồi.
+    ''')
+    print('--------------//---------------')
 
 #------------------MAIN()-----------------------------#
 if __name__ == '__main__':                                 
     welcome()
     while True:
-        Ai_call = start_recognizer()
+        ai_wake()
         query = ai_listen()
         if 'chào' in query:
             speak_v('Chào bạn')
@@ -173,8 +176,6 @@ if __name__ == '__main__':
             open_website()
         elif 'google' in query:
             google_search()
-        elif 'trò chơi' in query:
-            play_game()
         elif 'à thế à' in query:
             speak_v('À thế làm sao mà à')
         elif 'tạm biệt' in query:

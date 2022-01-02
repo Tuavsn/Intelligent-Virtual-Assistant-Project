@@ -7,11 +7,9 @@
 #                   pip install gTTS
 #                   pip install playsound
 #---------------------------//------------------------------#
-#-----------------IMPORT THƯ VIỆN--------------------#
-from math import e
-import runpy
-import pyttsx3                                  # THƯ VIỆN NÓI
-from gtts import gTTS
+#-----------------IMPORT THƯ VIỆN--------------------#      
+import requests                  
+from gtts import gTTS                           # THƯ VIỆN NÓI
 from playsound import playsound                 # THƯ VIỆN CHẠY NHẠC
 import os                                       # THƯ VIỆN MỞ ĐÓNG FILE
 from time import sleep
@@ -21,9 +19,6 @@ import webbrowser                               # THƯ VIỆN BROWSER
 #----------------ASSISTANT MACHINE-------------------#
 # KHỞI TẠO
 ai_ear = speech_recognition.Recognizer()        
-ai_mouth = pyttsx3.init()              
-voice=ai_mouth.getProperty('voices')
-ai_mouth.setProperty('voice',voice[1].id)                             # Thiết lập giọng nữ cho AI ( voice[0]: giọng nam )
 #------------------ASSISTANT FUNCTION------------------#
 
 def ai_listen():
@@ -35,7 +30,6 @@ def ai_listen():
     try:
         your_query=ai_ear.recognize_google(audio, language='vi-VN')    #Ai nhận diện giọng nói của bạn thông qua biến audio
     except:
-        speak_v('xin lỗi tôi không nghe được bạn nói')
         your_query=''
     return your_query.lower()
 
@@ -43,11 +37,11 @@ def ai_wake():
     while True:
         with speech_recognition.Microphone() as mic:
             ai_ear.dynamic_energy_threshold = 4000
-            audio = ai_ear.record(mic, duration=5)
+            audio = ai_ear.record(mic, duration=4)
         try:
-            speech_as_text = ai_ear.recognize_google(audio)
-            if "assistant" or "hey assistant" in speech_as_text:
-                speak_v("tôi có thể giúp gì cho bạn")
+            speech_as_text = ai_ear.recognize_google(audio, language='vi-VN')
+            if "Tôi cần hỗ trợ" in speech_as_text:
+                speak_v("Tôi có thể giúp gì cho bạn")
                 break
             else:
                 pass
@@ -67,21 +61,24 @@ def speak_v(audio):
     os.remove(filename)
 
 def speak(audio):
+    tts = gTTS(text=audio, lang='en',slow=False)
+    filename = 'voice.mp3'
+    tts.save(filename)
     print('AI: '+audio)
-    ai_mouth.say(audio)
-    ai_mouth.runAndWait()
+    playsound(filename)
+    os.remove(filename)
 
 def ngay():
     day = str(date.today().day)
     month = str(date.today().month)
     year = str(date.today().year)
-    today = 'hôm nay là ngày '+day+' tháng '+month+' năm '+year
+    today = 'Hôm nay là ngày '+day+' tháng '+month+' năm '+year
     speak_v(today)
 
 def gio():
     h = str(datetime.now().hour)
     p = str(datetime.now().minute)
-    Time='bây giờ là '+h+' giờ '+p+' phút'
+    Time='Bây giờ là '+h+' giờ '+p+' phút'
     speak_v(Time)
 
 def day():
@@ -104,8 +101,8 @@ def youtube_search():
     speak_v("Bạn đang tìm kiếm video trên Youtube.")
 
 def open_website():
-    speak_v('nhập website mà bạn muốn truy cập')
-    website = str(input('nhập website bạn muốn truy cập: https://www.'))
+    speak_v('Nhập website mà bạn muốn truy cập')
+    website = str(input('Nhập website bạn muốn truy cập: https://www.'))
     domain = website
     url = 'https://www.' + domain
     webbrowser.open(url)
@@ -122,6 +119,23 @@ def google_search():
     url="https://www.google.com/search?q="+domain
     webbrowser.open(url) 
 
+def open_facebook():
+    url='https://www.facebook.com'
+    webbrowser.open(url)
+    speak_v("đã truy cập facebook")
+
+def open_instagram():
+    url='https://www.instagram.com/'  
+    webbrowser.open(url) 
+    speak_v("đã truy cập instagram")
+
+def Weather():
+    api_address='http://api.openweathermap.org/data/2.5/weather?q=bienhoa&appid=cee343d33e41970dd63c44b39c8620ab'
+    json_data = requests.get(api_address).json()
+    format_add = json_data['main']
+    speak_v("Nhiệt độ thấp nhất là {1} Độ C, Nhiệt độ cao nhất là {2} Độ C".format(
+        json_data['weather'][0]['main'],int(format_add['temp_min']-273),int(format_add['temp_max']-273)))
+
 # def play_game():
 #     import importturtle
 #     importturtle.thread.stop()
@@ -130,7 +144,7 @@ def welcome():
     hour=datetime.now().hour
     if hour >=1 and hour < 6:
         speak_v('Xin chào')
-        speak_v('bạn vẫn còn thức sao')
+        speak_v('Bạn vẫn còn thức sao')
         speak_v("Hãy gọi tôi khi bạn cần") 
     elif hour >= 6 and hour < 12:
         speak_v('Chào buổi sáng')
@@ -142,7 +156,7 @@ def welcome():
         speak_v('Chào buổi tối')
         speak_v("Hãy gọi tôi khi bạn cần")
     print('------------------------------------------------')
-    print("Gọi tôi bằng lệnh: Assistant hoặc Hey Assistant")
+    print("Gọi tôi bằng lệnh: 'Tôi cần hỗ trợ'")
     print('--------------//---------------')
     print('''Một số chức năng cơ bản:
         1. Thông báo ngày, giờ.
@@ -172,15 +186,25 @@ if __name__ == '__main__':
             time()
         elif 'youtube' in query:
             youtube_search()
-        elif 'website' in query:
-            open_website()
         elif 'google' in query:
             google_search()
+        elif 'facebook' in query:
+            open_facebook()
+        elif 'instagram' in query:
+            open_instagram()
+        elif 'website' in query:
+            open_website()
         elif 'à thế à' in query:
             speak_v('À thế làm sao mà à')
+        elif 'thời tiết' in query:
+            Weather()
         elif 'tạm biệt' in query:
             speak_v('Tạm biệt bạn')
-            exit()
+            speak_v('Chúc bạn có một ngày may mắn và thành công')
+            break
         elif 'goodbye' in query:
             speak('Goodbye sir')
-            exit()
+            speak('Have a great day')
+            break
+        else:
+            speak_v('xin lỗi tôi không nghe được bạn nói')

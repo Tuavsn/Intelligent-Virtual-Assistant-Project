@@ -1,13 +1,5 @@
-#-----------IMPORTANT!!!! => YÊU CẦU:   -----------------#
-# MỞ TERMINAL =>    pip install pywin32
-#                   pip install pyttsx3
-#                   pip install speechrecognition
-#                   pip install pipwin
-#                   pipwin install pyaudio
-#                   pip install gTTS
-#                   pip install playsound
-#---------------------------//------------------------------#
 #-----------------IMPORT THƯ VIỆN--------------------#     
+from re import S
 from pynput.keyboard import Key, Controller
 import subprocess 
 import requests                  
@@ -69,12 +61,27 @@ def speak(audio):
     print('AI: '+audio)
     playsound(filename)
     os.remove(filename)
+# ---------------------------------//-----------------------------------//----------------
+def clear_screen():
+    os.system('cls')
 
-def open_app(app_name):
+def open_calculator():
     try: 
-        subprocess.Popen('C:\\Windows\\System32\\'+app_name[5:]+'.exe')
+        subprocess.Popen('C:\\Windows\\System32\\'+'calc'+'.exe')
     except: 
-        pass
+        print('có vẻ devC không nằm trong chỉ mục C:\Program Files (x86)\Dev-Cpp\ ')
+
+def open_devC():
+    try: 
+        subprocess.Popen('C:\\Program Files (x86)\\Dev-Cpp\\'+'devcpp'+'.exe')
+    except: 
+        print('có vẻ devC không nằm trong chỉ mục C:\Program Files (x86)\ ')
+
+def open_google_chrome():
+    try: 
+        subprocess.Popen('C:\\Program Files\\Google\\Chrome\\Application\\'+'chrome'+'.exe')
+    except: 
+        print('có vẻ Chrome không nằm trong chỉ mục C:\Program Files\Google\Chrome\Application ')
 
 def switchTab():
     Controller().press(Key.ctrl)
@@ -90,8 +97,8 @@ def closeTab():
 
 def newTab():
     Controller().press(Key.ctrl)
-    Controller().press('n')
-    Controller().release('n')
+    Controller().press('t')
+    Controller().release('t')
     Controller().release(Key.ctrl)
 
 def close_window():
@@ -132,10 +139,6 @@ def day():
 def time():
     Time = datetime.now().strftime('%I:%M:%p')
     speak(Time)
-
-def open_google_chrome():
-    url='https://www.google.com'
-    webbrowser.open(url)
 
 def youtube_search():
     speak_v('Bạn muốn xem gì?')
@@ -181,19 +184,24 @@ def thoi_tiet():
     api_address='http://api.openweathermap.org/data/2.5/weather?q=bienhoa&appid=cee343d33e41970dd63c44b39c8620ab'
     json_data = requests.get(api_address).json()
     format_add = json_data['main']
-    speak_v("Nhiệt độ trung bình là {0} Độ C, Nhiệt độ thấp nhất là {1} Độ C, Nhiệt độ cao nhất là {2} Độ C".format(
-        json_data['weather'][0]['main'],int(format_add['temp_min']-273),int(format_add['temp_max']-273)))
+    weather = json_data['weather'][0]['main']
+    if weather == 'Clouds':
+        weather = 'nhiều mây'
+    elif weather == 'Rainy':
+        weather = 'có mưa'
+    speak_v("Trời thì {0} và nhiệt độ hôm nay là {1} độ C".format(
+        weather,int(format_add['temp']-273)))
 
 def weather():
     api_address='http://api.openweathermap.org/data/2.5/weather?q=bienhoa&appid=cee343d33e41970dd63c44b39c8620ab'
     json_data = requests.get(api_address).json()
     format_add = json_data['main']
-    speak("Average temperature is {0} Celsius, Min temperature is {1} Celsius, Max temperature is {2} Celsius".format(
-        json_data['weather'][0]['main'],int(format_add['temp_min']-273),int(format_add['temp_max']-273)))
+    speak("It's {0} and the temperature is {1} Celcious".format(
+        json_data['weather'][0]['main'],int(format_add['temp']-273)))
 
-# def play_game():
-#     import importturtle
-#     importturtle.thread.stop()
+def play_game():
+    import importturtle
+    importturtle.thread.stop()
 
 def welcome():
     hour=datetime.now().hour
@@ -220,8 +228,9 @@ def welcome():
         4. Phóng lớn, thu nhỏ và đóng cửa sổ window.
         5. Đóng, chuyển và mở tab mới.
         6. Tuy cập facebook, instagram.
-        7. thông báo thời tiết
-        8. Mở Pain, Calculator (Nếu máy của bạn có đường dẫn C->windows->system32)
+        7. thông báo thời tiết.
+        8. Mở devC ('lệnh: lập trình hoặc programming), Calculator.
+        9. Trò chơi.
     ''')
     print('--------------//---------------')
 
@@ -234,17 +243,33 @@ if __name__ == '__main__':
         if 'chào' in query:
             speak_v('Chào bạn')
         elif 'hello' in query:
-            speak('Hello sir')
-        # elif 'thông tin của bạn':
-        #     assistant_information_v()
-        # elif 'your information':
-        #     assistant_information()
-        elif 'paint' in query:
-            open_app('mspaint')
-            speak('Paint was opened')
+            speak('Hello Sir')
+        elif 'chào buổi sáng' in query:
+            speak_v('Chào bạn')
+        elif 'chào buổi tối' in query:
+            speak_v('Chào bạn')
+        elif 'good morning' in query:
+            speak('Good morning Sir')
+        elif 'good afternoon' in query:
+            speak('Good afternoon Sir')
+        elif 'good evening' in query:
+            speak('Good evening Sir')
+        elif 'tên của bạn' in query:
+            speak_v('Tôi vẫn chưa có tên, bạn có thể gọi tôi là trợ lý ảo')
+        elif 'your name' in query:
+            speak("I don't have a name, you can call me Assistant")
+        elif 'máy tính' in query:
+            open_calculator()
+            speak_v('máy tính đã được mở')
         elif 'calculator' in query:
-            open_app('calc')
+            open_calculator()
             speak('Calculator was opened')
+        elif 'lập trình' in query:
+            open_devC()
+            speak('devC was opened')
+        elif 'programming' in query:
+            open_devC()
+            speak('devC was opened')
         elif 'đóng cửa sổ' in query:
             close_window()
         elif 'thu nhỏ cửa sổ' in query:
@@ -289,12 +314,20 @@ if __name__ == '__main__':
             open_instagram()
         elif 'website' in query:
             open_website()
+        elif 'trò chơi' in query:
+            play_game()
+        elif 'game' in query:
+            play_game()
         elif 'à thế à' in query:
             speak_v('À thế làm sao mà à')
         elif 'thời tiết' in query:
             thoi_tiet()
         elif 'weather' in query:
             weather()
+        elif 'xóa màn hình' in query:
+            clear_screen()
+        elif 'clear' in query:
+            clear_screen()
         elif 'you are so intelligent' in query:
             speak('Haha thank you very much, I love it')
         elif 'you are so beautiful' in query:

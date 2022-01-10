@@ -43,6 +43,7 @@ def ai_listen():
     try:
         your_query=ai_ear.recognize_google(audio, language='vi-VN')  
     except:
+        speak('Xin lỗi, tôi không thể nghe được bạn nói')
         your_query=''
     return your_query.lower()
 
@@ -220,6 +221,8 @@ def welcome():
         speak_v("Hãy gọi tôi khi bạn cần")
     print('------------------------------------------------')
     print("Gọi tôi bằng những lệnh sau: 'Wake up', 'Assistant', 'Tôi cần hỗ trợ', 'Trợ lý ảo'")
+
+def func_list():
     print('--------------//---------------')
     print('''Một số chức năng cơ bản:
         1. Thông báo ngày, giờ.
@@ -229,8 +232,9 @@ def welcome():
         5. Đóng, chuyển và mở tab mới.
         6. Tuy cập facebook, instagram.
         7. thông báo thời tiết.
-        8. Mở devC ('lệnh: lập trình hoặc programming), Calculator.
+        8. Mở devC (lệnh: 'lập trình' hoặc 'programming'), mở máy tính (Calculator).
         9. Trò chơi.
+        *Gọi lệnh 'xóa màn hình' hoặc 'clear' để xóa màn hình cmd.
     ''')
     print('--------------//---------------')
 
@@ -239,6 +243,7 @@ if __name__ == '__main__':
     welcome()
     while True:
         ai_wake()
+        func_list()
         query = ai_listen()
         if 'chào' in query:
             speak_v('Chào bạn')
@@ -326,12 +331,20 @@ if __name__ == '__main__':
             weather()
         elif 'xóa màn hình' in query:
             clear_screen()
+            func_list()
         elif 'clear' in query:
             clear_screen()
+            func_list()
         elif 'you are so intelligent' in query:
             speak('Haha thank you very much, I love it')
         elif 'you are so beautiful' in query:
             speak('Yeah, I know')
+        elif 'chức năng' in query:
+            func_list()
+        elif 'help' in query:
+            func_list()
+        elif 'thank you' in query:
+            speak('You are welcome')
         elif 'tạm biệt' in query:
             speak_v('Tạm biệt bạn')
             speak_v('Chúc bạn có một ngày may mắn và thành công')
@@ -341,4 +354,4 @@ if __name__ == '__main__':
             speak('Have a great day')
             break
         else:
-            speak_v('xin lỗi tôi không nghe được bạn nói')
+            speak_v('Tôi vẫn chưa có chức năng này')
